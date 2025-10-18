@@ -9,8 +9,20 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^2.0.24",
     "@clerk/nextjs": "^6.33.4",
+    "ai": "^5.0.76",
+    "axios": "^1.12.2",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "groq-sdk": "^0.33.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.545.0",
+    "mongoose": "^8.19.1",
     "next": "15.5.5",
     "react": "19.1.0",
     "react-dom": "19.1.0"

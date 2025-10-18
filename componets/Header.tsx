@@ -9,7 +9,7 @@ import {
 } from '@clerk/nextjs'
 const Header = () => {
   return (
-     <header className="flex justify-end items-center p-4 gap-4 h-16">
+     <header className="flex justify-end fixed top-0 right-0 items-center p-4 gap-4 h-16">
             <SignedOut>
                 <SignInButton />
                 <SignUpButton>
