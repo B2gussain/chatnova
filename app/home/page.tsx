@@ -68,10 +68,10 @@ const Page = () => {
                         how can I help you <span className="text-primary">today</span>?
                     </h3>
                     <div className='flex gap-2 mt-2 flex-wrap justify-center'>
-                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center'><NotebookPen className='text-[#ff7300] mr-2' /> Summarize text</div>
-                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center '><Brain className='text-[yellow] mr-2' /> Brainstorm ideas</div>
-                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center '><Flower className='text-[green] mr-2' /> Surprise me</div>
-                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center '><GraduationCap className='text-[blue] mr-2' /> Get advice</div>
+                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center' onClick={()=>setPrompt("Summarize text")}><NotebookPen className='text-[#ff7300] mr-2' /> Summarize text</div>
+                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center ' onClick={()=>setPrompt("Brainstorm ideas")} ><Brain className='text-[yellow] mr-2' /> Brainstorm ideas</div>
+                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center ' onClick={()=>setPrompt("Surprise me")}><Flower className='text-[green] mr-2' /> Surprise me</div>
+                        <div className='text-foreground/50 border-[2px] border-muted rounded-full px-3 py-1 flex justify-center items-center ' onClick={() => setPrompt("Get advice")}><GraduationCap className='text-[blue] mr-2' /> Get advice</div>
                     </div>
                 </div>
             ) : (
