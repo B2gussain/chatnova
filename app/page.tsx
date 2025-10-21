@@ -1,26 +1,33 @@
 'use client'
 
-import Image from 'next/image'
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Home from '@/componets/Home'
+import Sidebar from '@/componets/Sidebar'
+import StartLoader from '@/componets/StartLoader'
+import React, { useEffect, useState } from 'react'
 
 const Page = () => {
-  const router = useRouter()
+  const [inital, setinital] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/home')
+
+    setTimeout(() => {
+      setinital(false)
     }, 2000)
 
-    return () => clearTimeout(timer)
-  }, [router])
+  }, [])
 
   return (
-    <div className="h-dvh w-full bg-background flex justify-center items-center">
-      <div className="flex justify-center opacity-0 animate-[fadeIn_3s_ease-in-out_forwards] items-center gap-2">
-        <Image src="/logo.png" height={50} width={50} alt="ChatNova Logo" />
-        <h2 className="text-foreground font-semibold text-2xl">ChatNova</h2>
-      </div>
+    <div className="h-dvh  bg-background  justify-center items-center">
+      {inital ? (
+        <StartLoader />
+      ) : (
+        <>
+        {/* <Sidebar/> */}
+          <Home />
+        </>
+
+      )}
+
     </div>
   )
 }
