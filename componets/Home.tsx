@@ -16,11 +16,16 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {dracula} from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useUser } from '@clerk/nextjs'
 import Sidebar from "./Sidebar";
 import TypingLoader from "./TypingLoader";
 
 const Home = () => {
+   const { isLoaded, isSignedIn, user } = useUser()
+
+
+  
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [prompt, setPrompt] = useState("");
     const [messages, setMessages] = useState<
@@ -131,6 +136,7 @@ const Home = () => {
                     isSidebarOpen ? "md:ml-64" : ""
                 }`}
             >
+      
                 {messages.length === 0 ? (
                     <div className="py-4 w-full mx-auto flex flex-col justify-center items-center gap-2 text-center opacity-0 animate-[fadeIn_2s_ease-in-out_forwards]">
                         <div className="h-[100px] w-[100px] rounded-full flex justify-center items-center border-6 border-t-primary border-b-primary border-muted animate-spin-slow">
@@ -198,131 +204,91 @@ const Home = () => {
                 ) : (
                     <div className="flex h-full overflow-y-auto flex-col gap-4 mb-10 mt-16 pb-26 pt-14 px-4 ">
                         {messages.map((message, index) => (
-                            <div className="flex flex-col" key={index}>
-                                {message.role === "user" ? (
-                                    <p className="bg-primary text-white self-end rounded-4xl px-3 py-2 max-w-full w-fit text-right">
-                                        {message.content}
-                                    </p>
-                                ) : typeingLoader ? (
-                                    <TypingLoader />
-                                ) : (
-                                    <div className="bg-muted/0 text-white self-start rounded-lg px-3 py-2 max-w-full w-fit text-left prose prose-invert relative group">
-                                        <button
-                                            onClick={() =>
-                                                handleCopy(message.content)
-                                            }
-                                            className="absolute -bottom-5 transition-opacity p-1 rounded-md bg-zinc-800 hover:bg-zinc-700"
-                                        >
-                                            {copiedText === message.content ? (
-                                                <p className="flex gap-1 justify-center items-center text-sm px-2">
-                                                    <Check
-                                                        size={14}
-                                                        className="text-green-400"
-                                                    />{" "}
-                                                    Copied
-                                                </p>
-                                            ) : (
-                                                <p className="flex gap-1 justify-center items-center text-sm px-2">
-                                                    <Copy
-                                                        size={14}
-                                                        className="text-gray-400"
-                                                    />{" "}
-                                                    Copy
-                                                </p>
-                                            )}
-                                        </button>
+  <div className="flex flex-col" key={index}>
+    {message.role === "user" ? (
+      <p className="bg-primary text-white self-end rounded-4xl px-3 py-2 max-w-full w-fit text-right">
+        {message.content}
+      </p>
+    ) : (
+      <div className="bg-muted/0 text-white self-start rounded-lg px-3 py-2 max-w-full w-fit text-left prose prose-invert relative group">
+        <button
+          onClick={() => handleCopy(message.content)}
+          className="absolute -bottom-5 transition-opacity p-1 rounded-md bg-zinc-800 hover:bg-zinc-700"
+        >
+          {copiedText === message.content ? (
+            <p className="flex gap-1 justify-center items-center text-sm px-2">
+              <Check size={14} className="text-green-400" /> Copied
+            </p>
+          ) : (
+            <p className="flex gap-1 justify-center items-center text-sm px-2">
+              <Copy size={14} className="text-gray-400" /> Copy
+            </p>
+          )}
+        </button>
 
-                                        <ReactMarkdown
-                                            remarkPlugins={[remarkGfm]}
-                                            components={{
-                                                code({
-                                                    inline,
-                                                    className,
-                                                    children,
-                                                    ...props
-                                                }) {
-                                                    const match =
-                                                        /language-(\w+)/.exec(
-                                                            className || ""
-                                                        );
-                                                    const codeContent = String(
-                                                        children
-                                                    ).replace(/\n$/, "");
-                                                    return !inline && match ? (
-                                                        <div className="relative group/code">
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleCopy(
-                                                                        codeContent
-                                                                    )
-                                                                }
-                                                                className="absolute top-2 right-2 transition-opacity p-1 rounded-md bg-zinc-800 hover:bg-zinc-700"
-                                                            >
-                                                                {copiedText ===
-                                                                codeContent ? (
-                                                                    <p className="flex justify-center items-center text-sm px-2">
-                                                                        <Check
-                                                                            size={
-                                                                                14
-                                                                            }
-                                                                            className="text-green-400"
-                                                                        />{" "}
-                                                                        Copied
-                                                                    </p>
-                                                                ) : (
-                                                                    <p className="flex justify-center items-center text-sm px-2">
-                                                                        <Copy
-                                                                            size={
-                                                                                14
-                                                                            }
-                                                                            className="text-gray-400"
-                                                                        />{" "}
-                                                                        Copy
-                                                                    </p>
-                                                                )}
-                                                            </button>
-                                                            <SyntaxHighlighter
-                                                                style={
-                                                                    atomOneDark
-                                                                }
-                                                                language={
-                                                                    match[1]
-                                                                }
-                                                                PreTag="div"
-                                                                customStyle={{
-                                                                    background:
-                                                                        "#181717",
-                                                                    borderRadius:
-                                                                        "0.5rem",
-                                                                    padding:
-                                                                        "1rem",
-                                                                    fontSize:
-                                                                        "0.9rem",
-                                                                    overflowX:
-                                                                        "auto",
-                                                                }}
-                                                                {...props}
-                                                            >
-                                                                {codeContent}
-                                                            </SyntaxHighlighter>
-                                                        </div>
-                                                    ) : (
-                                                        <code
-                                                            className="bg-[#1d1c1c] text-[#f8f8f2] px-1 py-0.5 rounded"
-                                                            {...props}
-                                                        >
-                                                            {children}
-                                                        </code>
-                                                    );
-                                                },
-                                            }}
-                                        >
-                                            {message.content}
-                                        </ReactMarkdown>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            code({ inline, className, children, ...props }) {
+              const match = /language-(\w+)/.exec(className || "");
+              const codeContent = String(children).replace(/\n$/, "");
+              return !inline && match ? (
+                <div className="relative group/code">
+                  <button
+                    onClick={() => handleCopy(codeContent)}
+                    className="absolute top-2 right-2 transition-opacity p-1 rounded-md bg-zinc-800 hover:bg-zinc-700"
+                  >
+                    {copiedText === codeContent ? (
+                      <p className="flex justify-center items-center text-sm px-2">
+                        <Check size={14} className="text-green-400" /> Copied
+                      </p>
+                    ) : (
+                      <p className="flex justify-center items-center text-sm px-2">
+                        <Copy size={14} className="text-gray-400" /> Copy
+                      </p>
+                    )}
+                  </button>
+                  <SyntaxHighlighter
+                     style={dracula}
+                    language={match[1]}
+                    PreTag="div"
+                    customStyle={{
+                      background: "#0c0c0cff",
+                      borderRadius: "0.5rem",
+                      padding: "1rem",
+                      fontSize: "0.9rem",
+                      overflowX: "auto",
+                    }}
+                    {...props}
+                  >
+                    {codeContent}
+                  </SyntaxHighlighter>
+                </div>
+              ) : (
+                <code
+                  className="bg-[#1d1c1c] text-[#f8f8f2] px-1 py-0.5 rounded"
+                  {...props}
+                >
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
+      </div>
+    )}
+  </div>
+))}
+
+{/* ✅ Show loader only for current generating response */}
+{typeingLoader && (
+  <div className="self-start">
+    <TypingLoader />
+  </div>
+)}
+
                         {error && (
                             <p className="text-red-500 text-center">{error}</p>
                         )}

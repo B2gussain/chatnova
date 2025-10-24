@@ -26,7 +26,7 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-background text-white">
+        <div className="flex items-center justify-center h-dvh bg-background text-white">
             <div className="  p-8  w-full max-w-sm text-center">
                 <div className="flex animate-bounce mb-3 items-center justify-center">
                     <Image
