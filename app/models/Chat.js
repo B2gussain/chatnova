@@ -5,7 +5,7 @@ const MessageSchema = new mongoose.Schema(
     role: { type: String, enum: ["user", "assistant"], required: true },
     content: { type: String, required: true },
   },
-  { _id: false } // optional: don’t need separate _id for each message
+  { _id: false }
 );
 
 const ChatSchema = new mongoose.Schema(
@@ -17,5 +17,4 @@ const ChatSchema = new mongoose.Schema(
 );
 
 const Chat = mongoose.models.Chat || mongoose.model("Chat", ChatSchema);
-
 export default Chat;

@@ -2,10 +2,11 @@
 
 import Sidebar from "@/componets/Sidebar";
 import { Menu, LogOut } from "lucide-react";
-import Image from "next/image";
+
 import React, { useState, useEffect } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Page = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -73,10 +74,12 @@ const Page = () => {
           isSignedIn && user ? (
             <div className="flex flex-col items-center gap-4">
               {/* User Avatar */}
-              <img
+              <Image
+              height={100}
+              width={100}
                 src={user.imageUrl}
                 alt={user.fullName || "User Avatar"}
-                className="w-24 h-24 rounded-full border-2 border-primary object-cover"
+                className=" rounded-full border-2 border-primary object-cover"
               />
 
               {/* User Details */}
@@ -96,7 +99,7 @@ const Page = () => {
 
               {/* Logout Button */}
               <SignOutButton>
-                <button className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg mt-4">
+                <button className="flex items-center cursor-pointer gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg mt-4">
                   <LogOut size={20} />
                   Logout
                 </button>
@@ -105,7 +108,7 @@ const Page = () => {
           ) : (
             <button
               onClick={() => router.push("/auth")}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-lg"
             >
               Sign In
             </button>

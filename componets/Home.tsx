@@ -68,41 +68,51 @@ const Home = () => {
     }
   };
 
-  const prompt_handle = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prompt.trim()) return;
+const [chatId, setChatId] = useState<string | null>(null);
 
-    setIsLoading(true);
-    setError(null);
-    setMessages((prev) => [...prev, { role: "user", content: prompt }]);
-    setTypeingLoader(true);
+const prompt_handle = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!prompt.trim()) return;
 
-    try {
-      // ✅ Properly pass user info in headers
-      const res = await axios.post(
-        "/api/groq",
-        { prompt },
-        {
-          headers: {
-            username: user?.fullName || "", // fallback if not loaded
-            email: isLoaded && isSignedIn ? user?.primaryEmailAddress?.emailAddress || "" : "",
-          },
-        }
-      );
+  setIsLoading(true);
+  setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+  setTypeingLoader(true);
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: res.data.message },
-      ]);
-    } catch (err) {
-      setError("Failed to fetch response. Please try again.");
-      console.error("API error:", err);
-    } finally {
-      setTypeingLoader(false);
-      setIsLoading(false);
-      setPrompt("");
+  try {
+    const res = await axios.post(
+      "/api/groq",
+      { prompt, chatId },
+      {
+        headers: {
+          username: user?.fullName || "",
+          email: isLoaded && isSignedIn ? user?.primaryEmailAddress?.emailAddress || "" : "",
+        },
+      }
+    );
+
+    if (res.data.chatId && !chatId) {
+      setChatId(res.data.chatId); // store chat id
     }
-  };
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: res.data.message },
+    ]);
+  } catch (err) {
+    setError("Failed to fetch response. Please try again.");
+  } finally {
+    setTypeingLoader(false);
+    setIsLoading(false);
+    setPrompt("");
+  }
+};
+
+// When clicking "New Chat"
+const handleNewChat = () => {
+  setMessages([]);
+  setChatId(null);
+};
+
 
 
   return (
@@ -140,6 +150,7 @@ const Home = () => {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           isMobile={isMobile}
+           onNewChat={handleNewChat}
         />
       </div>
 

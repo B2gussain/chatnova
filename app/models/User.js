@@ -6,10 +6,8 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat" }],
   },
-  { timestamps: true } // automatically adds createdAt and updatedAt
+  { timestamps: true }
 );
 
-// Hot reload safe
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
-
 export default User;
