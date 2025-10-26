@@ -22,6 +22,15 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/lib/connectDB.js",
+    "app/models/User.js",
+    "app/middleware/authMiddleware.js",
+    "app/api/groq/route.js"
+, "app/api/allhistory/route.js"  ],
   "exclude": ["node_modules"]
 }

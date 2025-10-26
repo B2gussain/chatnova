@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Plus, History, Settings, X, MessageSquare, CircleUserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import axios from "axios";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,6 +15,23 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, onClose, isMobile }: SidebarProps) => {
   const { isLoaded, isSignedIn, user } = useUser();
+  useEffect(() => {
+    const fetch_history =async () => {
+      const res = await axios.get("/api/allhistory", {
+        params: { email: user?.primaryEmailAddress?.emailAddress },
+      });
+      console.log(res.data.chats);
+    }
+    if(isLoaded&& isSignedIn&& user){
+fetch_history()
+    }
+    
+
+
+
+
+  }, [])
+
 
   return (
     <aside
