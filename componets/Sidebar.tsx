@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
-  History,
   Settings,
   X,
   MessageSquare,
@@ -14,32 +13,46 @@ import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 
+interface ChatItem {
+  messages: any; // can be string | object | array
+}
+
 interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
   isMobile?: boolean;
-  onNewChat?: () => void; // ✅ Added this prop
+  onNewChat?: () => void;
 }
 
 const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
   const { isLoaded, isSignedIn, user } = useUser();
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetch_history = async () => {
+    const fetchHistory = async () => {
+      if (!user?.primaryEmailAddress?.emailAddress) return;
+
       try {
+        setLoading(true);
         const res = await axios.get("/api/allhistory", {
-          params: { email: user?.primaryEmailAddress?.emailAddress },
+          params: { email: user.primaryEmailAddress.emailAddress },
         });
-        console.log(res.data.chats);
+
+        // ✅ Ensure newest (most recent) chat appears first
+        const chats = res.data.chats || [];
+        setChatHistory(chats.reverse());
       } catch (err) {
         console.error("Error fetching history:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (isLoaded && isSignedIn && user) {
-      fetch_history();
+      fetchHistory();
     }
-  }, [isLoaded, isSignedIn, user]); // ✅ fixed dependency array
+  }, [isLoaded, isSignedIn, user]);
 
   return (
     <aside
@@ -66,7 +79,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
           </button>
         </div>
 
-        {/* ✅ New Chat Button */}
+        {/* New Chat Button */}
         <button
           onClick={() => {
             onNewChat?.();
@@ -78,33 +91,36 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
           <span>New Chat</span>
         </button>
 
-        {/* Recent Chats */}
+        {/* ✅ First Prompt & Recent Chats */}
         <div className="text-gray-400 text-sm mb-2">Recent</div>
+
         <div className="flex flex-col gap-1 overflow-y-auto max-h-[65vh] scrollbar-thin scrollbar-thumb-[#333] scrollbar-track-transparent">
-          {["AI Assistant", "Marketing Plan", "Code Debug", "Daily Ideas"].map(
-            (item, i) => (
+          {loading ? (
+            <p className="text-gray-500 text-sm text-center mt-3">Loading...</p>
+          ) : chatHistory.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center mt-3">No recent chats</p>
+          ) : (
+            chatHistory.map((item, i) => (
               <button
                 key={i}
                 className="flex items-center gap-2 p-2 px-3 rounded-lg hover:bg-[#222] text-gray-300 transition"
               >
                 <MessageSquare size={16} />
-                <span className="truncate">{item}</span>
+                <span className="truncate">
+                  {Array.isArray(item.messages)
+                    ? item.messages[0]?.content || "Untitled Chat" // ✅ Show first prompt
+                    : typeof item.messages === "object"
+                    ? item.messages.content || "Untitled Chat"
+                    : item.messages || "Untitled Chat"}
+                </span>
               </button>
-            )
+            ))
           )}
         </div>
       </div>
 
       {/* Bottom Section */}
       <div className="flex flex-col gap-2 border-t border-[#222] pt-3">
-        <Link
-          href="/history"
-          className="flex items-center gap-2 p-2 px-3 rounded-lg hover:bg-[#222] text-gray-300 transition"
-        >
-          <History size={16} />
-          <span>History</span>
-        </Link>
-
         <Link
           href="/setting"
           className="flex items-center gap-2 p-2 px-3 rounded-lg hover:bg-[#222] text-gray-300 transition"
@@ -113,7 +129,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
           <span>Settings</span>
         </Link>
 
-        {/* ✅ User Section */}
+        {/* User Section */}
         {isLoaded && isSignedIn && user ? (
           <div className="flex items-center gap-2 pl-2">
             <img
