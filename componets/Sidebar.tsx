@@ -29,25 +29,26 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const fetchHistory = async () => {
+    if (!user?.primaryEmailAddress?.emailAddress) return;
+
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/allhistory", {
+        params: { email: user.primaryEmailAddress.emailAddress },
+      });
+
+      // ✅ Ensure newest (most recent) chat appears first
+      const chats = res.data.chats || [];
+      setChatHistory(chats.reverse());
+    } catch (err) {
+      console.error("Error fetching history:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchHistory = async () => {
-      if (!user?.primaryEmailAddress?.emailAddress) return;
 
-      try {
-        setLoading(true);
-        const res = await axios.get("/api/allhistory", {
-          params: { email: user.primaryEmailAddress.emailAddress },
-        });
-
-        // ✅ Ensure newest (most recent) chat appears first
-        const chats = res.data.chats || [];
-        setChatHistory(chats.reverse());
-      } catch (err) {
-        console.error("Error fetching history:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     if (isLoaded && isSignedIn && user) {
       fetchHistory();
@@ -82,6 +83,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
         {/* New Chat Button */}
         <button
           onClick={() => {
+            fetchHistory();
             onNewChat?.();
             if (isMobile) onClose?.();
           }}
@@ -96,12 +98,21 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
 
         <div className="flex flex-col gap-1 overflow-y-auto max-h-[65vh] scrollbar-thin scrollbar-thumb-[#333] scrollbar-track-transparent">
           {loading ? (
-            <p className="text-gray-500 text-sm text-center mt-3">Loading...</p>
+            <div className="flex flex-col gap-2 text-sm text-center mt-3">
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="w-full h-8 bg-muted rounded-lg animate-pulse mb-2"
+                ></div>
+              ))}
+
+            </div>
           ) : chatHistory.length === 0 ? (
             <p className="text-gray-500 text-sm text-center mt-3">No recent chats</p>
           ) : (
             chatHistory.map((item, i) => (
-              <button
+              <Link
+                href={`/history/${item._id}`} // ✅ use backticks & proper field (_id from MongoDB)
                 key={i}
                 className="flex items-center gap-2 p-2 px-3 rounded-lg hover:bg-[#222] text-gray-300 transition"
               >
@@ -110,10 +121,11 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
                   {Array.isArray(item.messages)
                     ? item.messages[0]?.content || "Untitled Chat" // ✅ Show first prompt
                     : typeof item.messages === "object"
-                    ? item.messages.content || "Untitled Chat"
-                    : item.messages || "Untitled Chat"}
+                      ? item.messages.content || "Untitled Chat"
+                      : item.messages || "Untitled Chat"}
                 </span>
-              </button>
+              </Link>
+
             ))
           )}
         </div>
