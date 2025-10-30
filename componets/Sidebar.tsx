@@ -12,9 +12,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface ChatItem {
-  messages: any; // can be string | object | array
+  _id: string;
+  messages: any;
 }
 
 interface SidebarProps {
@@ -25,6 +27,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
+  const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser();
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,7 +41,6 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
         params: { email: user.primaryEmailAddress.emailAddress },
       });
 
-      // ✅ Ensure newest (most recent) chat appears first
       const chats = res.data.chats || [];
       setChatHistory(chats.reverse());
     } catch (err) {
@@ -47,13 +49,26 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-
-
     if (isLoaded && isSignedIn && user) {
       fetchHistory();
     }
   }, [isLoaded, isSignedIn, user]);
+
+  const handleNewChat = () => {
+    // Call the parent's onNewChat to reset state
+    onNewChat?.();
+    
+    // Navigate to home route
+    router.push("/");
+    
+    // Close sidebar on mobile
+    if (isMobile) onClose?.();
+    
+    // Refresh chat history
+    fetchHistory();
+  };
 
   return (
     <aside
@@ -82,18 +97,14 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
 
         {/* New Chat Button */}
         <button
-          onClick={() => {
-            fetchHistory();
-            onNewChat?.();
-            if (isMobile) onClose?.();
-          }}
+          onClick={handleNewChat}
           className="w-full bg-[#1e1e1e] hover:bg-[#222] text-white rounded-lg flex items-center gap-2 p-2 mb-4 transition"
         >
           <Plus size={18} />
           <span>New Chat</span>
         </button>
 
-        {/* ✅ First Prompt & Recent Chats */}
+        {/* Recent Chats */}
         <div className="text-gray-400 text-sm mb-2">Recent</div>
 
         <div className="flex flex-col gap-1 overflow-y-auto max-h-[65vh] scrollbar-thin scrollbar-thumb-[#333] scrollbar-track-transparent">
@@ -105,27 +116,28 @@ const Sidebar = ({ isOpen, onClose, isMobile, onNewChat }: SidebarProps) => {
                   className="w-full h-8 bg-muted rounded-lg animate-pulse mb-2"
                 ></div>
               ))}
-
             </div>
           ) : chatHistory.length === 0 ? (
             <p className="text-gray-500 text-sm text-center mt-3">No recent chats</p>
           ) : (
             chatHistory.map((item, i) => (
               <Link
-                href={`/history/${item._id}`} // ✅ use backticks & proper field (_id from MongoDB)
+                href={`/history/${item._id}`}
                 key={i}
+                onClick={() => {
+                  if (isMobile) onClose?.();
+                }}
                 className="flex items-center gap-2 p-2 px-3 rounded-lg hover:bg-[#222] text-gray-300 transition"
               >
                 <MessageSquare size={16} />
                 <span className="truncate">
                   {Array.isArray(item.messages)
-                    ? item.messages[0]?.content || "Untitled Chat" // ✅ Show first prompt
+                    ? item.messages[0]?.content || "Untitled Chat"
                     : typeof item.messages === "object"
                       ? item.messages.content || "Untitled Chat"
                       : item.messages || "Untitled Chat"}
                 </span>
               </Link>
-
             ))
           )}
         </div>

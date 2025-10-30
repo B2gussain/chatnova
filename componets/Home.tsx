@@ -20,12 +20,11 @@ import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useUser } from '@clerk/nextjs'
 import Sidebar from "./Sidebar";
 import TypingLoader from "./TypingLoader";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
+  const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser()
-
-
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState<
@@ -108,10 +107,12 @@ const prompt_handle = async (e: React.FormEvent) => {
 };
 
 // When clicking "New Chat"
-const handleNewChat = () => {
-  setMessages([]);
-  setChatId(null);
-};
+ const handleNewChat = () => {
+  router.push("/"); // 👈 navigate to home route
+    setMessages([]);
+    setChatId(null);
+    
+  };
 
 
 
