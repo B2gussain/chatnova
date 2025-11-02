@@ -1,7 +1,6 @@
 'use client'
 
 import Home from '@/componets/Home'
-import Sidebar from '@/componets/Sidebar'
 import StartLoader from '@/componets/StartLoader'
 import React, { useEffect, useState } from 'react'
 

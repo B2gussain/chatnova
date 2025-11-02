@@ -32,3 +32,21 @@ export async function GET(req, { params }) {
     );
   }
 }
+
+export async function DELETE(req, { params }) {
+  try {
+    await connectDB();
+
+    const { id } = params;
+    const deletedChat = await Chat.findByIdAndDelete(id);
+
+    if (!deletedChat) {
+      return new Response(JSON.stringify({ error: "Chat not found" }), { status: 404 });
+    }
+
+    return new Response(JSON.stringify({ message: "Chat deleted successfully" }), { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: "Failed to delete chat" }), { status: 500 });
+  }
+}

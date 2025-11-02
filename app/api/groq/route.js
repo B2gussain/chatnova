@@ -1,5 +1,4 @@
 import Groq from "groq-sdk";
-import mongoose from "mongoose";
 import Chat from "../../models/Chat";
 import User from "../../models/User";
 import connectDB from "../../lib/connectDB";

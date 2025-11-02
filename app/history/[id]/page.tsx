@@ -1,12 +1,12 @@
 "use client";
 
 import Sidebar from "@/componets/Sidebar";
-import TypingLoader from "@/componets/TypingLoader";
+// import TypingLoader from "@/componets/TypingLoader";
 import axios from "axios";
 import { Check, Copy, Menu } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -32,7 +32,7 @@ const Page: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [copiedText, setCopiedText] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [typingLoader, setTypingLoader] = useState(false);
+    // const [typingLoader, setTypingLoader] = useState(false);
     const [createdAt, setCreatedAt] = useState<string>("");
 
     // ✅ Fetch chat messages
@@ -98,9 +98,8 @@ const Page: React.FC = () => {
             {/* === Sidebar + Overlay === */}
             {isSidebarOpen && (
                 <div
-                    className={`${
-                        isMobile ? "fixed inset-0 z-40" : "fixed inset-y-0 left-0 z-40"
-                    }`}
+                    className={`${isMobile ? "fixed inset-0 z-40" : "fixed inset-y-0 left-0 z-40"
+                        }`}
                 >
                     {isMobile && (
                         <div
@@ -118,9 +117,8 @@ const Page: React.FC = () => {
 
             {/* === Main Content === */}
             <main
-                className={`flex-1 h-dvh flex flex-col justify-start items-center bg-background transition-all duration-300 overflow-hidden ${
-                    !isMobile && isSidebarOpen ? "md:ml-64" : ""
-                }`}
+                className={`flex-1 h-dvh flex flex-col justify-start items-center bg-background transition-all duration-300 overflow-hidden ${!isMobile && isSidebarOpen ? "md:ml-64" : ""
+                    }`}
             >
                 {/* Header Section */}
                 <div className="w-full flex flex-col items-center pt-4 sm:pt-6 pb-3 px-4 sm:px-6">
@@ -168,7 +166,11 @@ const Page: React.FC = () => {
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkGfm]}
                                                 components={{
-                                                    code({ inline, className, children, ...props }) {
+                                                    code({ inline, className, children, ...props }: {
+                                                        inline?: boolean;
+                                                        className?: string;
+                                                        children?: ReactNode;
+                                                    }) {
                                                         const match = /language-(\w+)/.exec(className || "");
                                                         const codeContent = String(children).replace(/\n$/, "");
 
@@ -226,12 +228,7 @@ const Page: React.FC = () => {
                                 </div>
                             ))}
 
-                            {/* ✅ Typing loader */}
-                            {typingLoader && (
-                                <div className="self-start">
-                                    <TypingLoader />
-                                </div>
-                            )}
+
 
                             {error && (
                                 <p className="text-red-500 text-center text-sm sm:text-base">

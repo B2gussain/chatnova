@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
 import {
   ArrowUp,
@@ -67,51 +67,52 @@ const Home = () => {
     }
   };
 
-const [chatId, setChatId] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
 
-const prompt_handle = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!prompt.trim()) return;
+  const prompt_handle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
 
-  setIsLoading(true);
-  setMessages((prev) => [...prev, { role: "user", content: prompt }]);
-  setTypeingLoader(true);
+    setIsLoading(true);
+    setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+    setTypeingLoader(true);
 
-  try {
-    const res = await axios.post(
-      "/api/groq",
-      { prompt, chatId },
-      {
-        headers: {
-          username: user?.fullName || "",
-          email: isLoaded && isSignedIn ? user?.primaryEmailAddress?.emailAddress || "" : "",
-        },
+    try {
+      const res = await axios.post(
+        "/api/groq",
+        { prompt, chatId },
+        {
+          headers: {
+            username: user?.fullName || "",
+            email: isLoaded && isSignedIn ? user?.primaryEmailAddress?.emailAddress || "" : "",
+          },
+        }
+      );
+
+      if (res.data.chatId && !chatId) {
+        setChatId(res.data.chatId); // store chat id
       }
-    );
 
-    if (res.data.chatId && !chatId) {
-      setChatId(res.data.chatId); // store chat id
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: res.data.message },
+      ]);
+    } catch (err) {
+      setError("Failed to fetch response. Please try again.");
+      console.log(err)
+    } finally {
+      setTypeingLoader(false);
+      setIsLoading(false);
+      setPrompt("");
     }
+  };
 
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: res.data.message },
-    ]);
-  } catch (err) {
-    setError("Failed to fetch response. Please try again.");
-  } finally {
-    setTypeingLoader(false);
-    setIsLoading(false);
-    setPrompt("");
-  }
-};
-
-// When clicking "New Chat"
- const handleNewChat = () => {
-  router.push("/"); // 👈 navigate to home route
+  // When clicking "New Chat"
+  const handleNewChat = () => {
+    router.push("/"); // 👈 navigate to home route
     setMessages([]);
     setChatId(null);
-    
+
   };
 
 
@@ -151,7 +152,7 @@ const prompt_handle = async (e: React.FormEvent) => {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           isMobile={isMobile}
-           onNewChat={handleNewChat}
+          onNewChat={handleNewChat}
         />
       </div>
 
@@ -257,7 +258,11 @@ const prompt_handle = async (e: React.FormEvent) => {
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code({ inline, className, children, ...props }) {
+                        code({ inline, className, children, ...props }: {
+                          inline?: boolean;
+                          className?: string;
+                          children?: ReactNode;
+                        }) {
                           const match = /language-(\w+)/.exec(className || "");
                           const codeContent = String(children).replace(/\n$/, "");
                           return !inline && match ? (

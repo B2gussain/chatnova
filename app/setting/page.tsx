@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "@/componets/Sidebar";
-import { Menu, LogOut, Mail, History, Phone } from "lucide-react";
+import { Menu, LogOut, Mail, History } from "lucide-react";
 
 import React, { useState, useEffect } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
