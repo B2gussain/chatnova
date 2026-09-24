@@ -1,25 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs";
 // import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { OAuthStrategy } from "@clerk/types"; 
+import { OAuthStrategy } from "@clerk/types";
 export default function AuthPage() {
     // const router = useRouter();
     const [loader, setloader] = useState(false)
     const { isLoaded: signInLoaded, signIn } = useSignIn();
-    const { isLoaded: signUpLoaded, signUp } = useSignUp();
-
-    const [mode, setMode] = useState<"signin" | "signup">("signin"); // toggle between sign-in and sign-up
 
     const handleOAuth = async (provider: OAuthStrategy) => {
         setloader(true)
-        const target = mode === "signin" ? signIn : signUp;
-        const ready = mode === "signin" ? signInLoaded : signUpLoaded;
-        if (!ready || !target) return;
+        if (!signInLoaded || !signIn) return;
 
-        await target.authenticateWithRedirect({
+        // Clerk's OAuth flow signs the user in if the account exists,
+        // or creates it automatically otherwise — no separate signup step needed.
+        await signIn.authenticateWithRedirect({
             strategy: provider,
             redirectUrl: "/", // where Clerk redirects back
             redirectUrlComplete: "/",
@@ -44,9 +41,7 @@ export default function AuthPage() {
                 </div>
 
                 <p className="text-gray-400 mb-6">
-                    {mode === "signin"
-                        ? "Sign in to continue to ChatNova"
-                        : "Sign up to start chatting with AI"}
+                    Sign in or sign up to continue to ChatNova
                 </p>
 
                 <div className="space-y-4">
@@ -76,29 +71,6 @@ export default function AuthPage() {
 
                 </div>
 
-                <p className="text-gray-400 text-sm mt-6">
-                    {mode === "signin" ? (
-                        <>
-                            Don’t have an account?{" "}
-                            <button
-                                onClick={() => setMode("signup")}
-                                className="text-blue-400 cursor-pointer hover:underline"
-                            >
-                                Sign up
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            Already have an account?{" "}
-                            <button
-                                onClick={() => setMode("signin")}
-                                className="text-blue-400 cursor-pointer hover:underline"
-                            >
-                                Sign in
-                            </button>
-                        </>
-                    )}
-                </p>
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "@/componets/Sidebar";
-import { Menu, MessageSquare, Trash2 } from "lucide-react";
+import { ArrowLeft, Menu, MessageSquare, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
@@ -198,9 +198,18 @@ const Page = () => {
         className={`flex-1 h-dvh w-full flex flex-col pt-16 sm:pt-20 items-center bg-background transition-all duration-300 px-4 sm:px-6 ${!isMobile && isSidebarOpen ? "md:ml-64" : ""
           }`}
       >
-        <h1 className="text-xl sm:text-2xl font-semibold text-white mb-4 sm:mb-6">
-          Chat History
-        </h1>
+        <div className="flex items-center gap-3 w-full max-w-3xl mb-4 sm:mb-6">
+          <Link
+            href="/"
+            className="text-gray-400 hover:text-white transition p-1 -ml-1 rounded-md hover:bg-white/10"
+            title="Back to chat"
+          >
+            <ArrowLeft size={20} />
+          </Link>
+          <h1 className="text-xl sm:text-2xl font-semibold text-white">
+            Chat History
+          </h1>
+        </div>
 
         <div className="flex flex-col w-full max-w-3xl gap-2 overflow-y-auto max-h-[85vh] scrollbar-thin scrollbar-thumb-[#333] scrollbar-track-transparent pb-4">
           {loading ? (
