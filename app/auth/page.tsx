@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSignIn } from "@clerk/nextjs";
 // import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { OAuthStrategy } from "@clerk/types";
+import { OAuthStrategy } from "@clerk/shared/types";
 export default function AuthPage() {
     // const router = useRouter();
     const [loader, setloader] = useState(false)

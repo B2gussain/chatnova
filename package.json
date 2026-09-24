@@ -11,6 +11,7 @@
   "dependencies": {
     "@ai-sdk/groq": "^2.0.24",
     "@clerk/nextjs": "^6.33.4",
+    "@clerk/shared": "^3.48.0",
     "ai": "^5.0.76",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
